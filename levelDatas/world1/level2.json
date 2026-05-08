@@ -1,0 +1,79 @@
+{
+  "music": "favela_ambience",
+  "bgSrc": "https://i.imgur.com/oLEyYTc.png",
+  "skySrc": "https://i.imgur.com/5VHS2zP.png",
+  "filter": { "r": 207, "g": 130, "b": 173, "a": 0.5 },
+  "player": { "x": 150, "y": 374 },
+  "startPlat": { "x": 0, "y": 442 },
+  "exitPlat": { "x": 10500, "y": 522 },
+  "checkpoint": { "x": 5916, "y": 422 },
+  "tomato": { "x": 8750, "y": 592 },
+  "platforms": [
+    { "x": -100, "y": 462, "w": 1600, "type": "stone1" },
+    { "x": 3450, "y": 482, "w": 500, "type": "stone1" },
+    { "x": 4450, "y": 482, "w": 1700, "type": "stone1" },
+    { "x": 3950, "y": -28, "w": 500, "type": "stone1" },
+    { "x": 8700, "y": 682, "w": 1200, "type": "stone1" },
+    { "x": 9850, "y": 442, "w": 300, "type": "stone1" },
+    { "x": 10300, "y": 542, "w": 500, "type": "stone1" }
+  ],
+  "walkways": [
+    { "x": 1650, "y": 462, "w": 400, "h": 50, "type": "wood1" },
+    { "x": 2200, "y": 442, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 2500, "y": 442, "w": 300, "h": 50, "type": "wood1" },
+    { "x": 2900, "y": 462, "w": 450, "h": 50, "type": "wood1" },
+    { "x": 6350, "y": 482, "w": 300, "h": 50, "type": "wood1" },
+    { "x": 6800, "y": 482, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 7100, "y": 482, "w": 316, "h": 50, "type": "wood1" },
+    { "x": 7500, "y": 182, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 7850, "y": 222, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 8150, "y": 182, "w": 500, "h": 50, "type": "wood1" },
+    { "x": 8800, "y": 182, "w": 150, "h": 50, "type": "wood1" },
+    { "x": 9100, "y": 182, "w": 150, "h": 50, "type": "wood1" },
+    { "x": 9400, "y": 182, "w": 150, "h": 50, "type": "wood1" }
+  ],
+  "house": [
+    { "x": 3700, "y": 482, "direction": "up", "floors": 3 },
+    { "x": 4460, "y": 482, "direction": "down", "floors": 3 },
+    { "x": 5060, "y": 482, "direction": "up", "floors": 4 },
+    { "x": 5316, "y": 482, "direction": "down", "floors": 4 },
+    { "x": 7200, "y": 482, "direction": "up", "floors": 3 },
+    { "x": 9600, "y": 682, "direction": "up", "floors": 2 }
+  ],
+  "props": [
+    { "x": 200, "y": 392, "type": "favelaHouse2", "big": true },
+    { "x": 250, "y": 412, "type": "bush" },
+    { "x": 450, "y": 402, "type": "bushFlower" },
+    { "x": 500, "y": 392, "type": "bush" },
+    { "x": 600, "y": 392, "type": "favelaHouse1", "big": true },
+    { "x": 850, "y": 392, "type": "bush" },
+    { "x": 960, "y": 397, "type": "bush" },
+    { "x": 1070, "y": 392, "type": "bushButterfly", "gif": true },
+    { "x": 1150, "y": 392, "type": "favelaHouse2", "big": true },
+    { "x": 1425, "y": 392, "type": "signWarn" },
+    { "x": 3550, "y": 412, "type": "pole1" },
+    { "x": 4050, "y": -93, "type": "bench1" },
+    { "x": 4250, "y": -93, "type": "bench1" },
+    { "x": 4722, "y": 412, "type": "bush" },
+    { "x": 4822, "y": 414, "type": "bushButterfly", "gif": true },
+    { "x": 4922, "y": 412, "type": "bush" },
+    { "x": 5516, "y": 412, "type": "favelaHouse1", "big": true },
+    { "x": 5791, "y": 412, "type": "pole1" },
+    { "x": 5916, "y": 412, "type": "favelaHouse3", "big": true },
+    { "x": 8200, "y": 112, "type": "signWarn" },
+    { "x": 9125, "y": 242, "type": "signGo" },
+    { "x": 9900, "y": 372, "type": "favelaHouse3", "big": true },
+    { "x": 10350, "y": 472, "type": "bushButterfly", "gif": true }
+  ],
+  "pexeira": [
+    { "x": 1850, "y": 372, "vx": -2 },
+    { "x": 2750, "y": 352, "vx": -6 },
+    { "x": 4200, "y": -118, "vx": -4 },
+    { "x": 6900, "y": 372, "vx": -4 },
+    { "x": 9500, "y": 572, "vx": "-12*Math.sin(gameTime/30)" }
+  ],
+  "rosal": [
+    { "x": 3300, "y": 372, "cooldown": 60, "bulletTime": 60 },
+    { "x": 8600, "y": 92, "cooldown": 75, "bulletTime": 75 }
+  ]
+}
