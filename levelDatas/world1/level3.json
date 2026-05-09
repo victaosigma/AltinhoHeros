@@ -23,6 +23,7 @@
     { "x": 8280, "y": 568, "w": 400, "type": "dirt2" },
     { "x": 9280, "y": 408, "w": 800, "type": "dirt2" },
     { "x": 10040, "y": 388, "w": 1500, "type": "dirt2" },
+    { "x": 11890, "y": 248, "w": 50, "type": "dirt2", "breakable": true },
     { "x": 11690, "y": 368, "w": 400, "type": "dirt2" },
   ],
   "topPlatforms": [
