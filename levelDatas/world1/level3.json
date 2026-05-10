@@ -27,12 +27,14 @@
     { "x": 12260, "y": 348, "w": 50, "type": "wood1", "breakable": true },
     { "x": 12060, "y": 638, "w": 1100, "type": "dirt2" },
     { "x": 11690, "y": 368, "w": 400, "type": "dirt2" },
-    { "x": 13140, "y": 418, "w": 1100, "type": "dirt2" },
+    { "x": 13140, "y": 308, "w": 1100, "type": "dirt2" }
   ],
   "topPlatforms": [
     { "x": 3110, "y": 482, "w": 150, "type": "dirt2" },
     { "x": 9080, "y": 558, "w": 200, "type": "dirt2" },
-    { "x": 8880, "y": 448, "w": 200, "type": "dirt2" }
+    { "x": 8880, "y": 448, "w": 200, "type": "dirt2" },
+    { "x": 12840, "y": 418, "w": 200, "type": "dirt2", "stackable": true },
+    { "x": 12740, "y": 528, "w": 400, "type": "dirt2", "stackable": true }
   ],
   "walkways": [
     { "x": 4010, "y": 602, "w": 200, "h": 50, "type": "wood1" },
