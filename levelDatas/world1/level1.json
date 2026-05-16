@@ -35,7 +35,7 @@
     { "x": 1025, "y": 522, "type": "bushFlower", "front": true },
     { "x": 1150, "y": 522, "type": "bush", "front": true },
     { "x": 1275, "y": 522, "type": "bushFlower", "front": true },
-    { "x": 1350, "y": 318, "type": "signRun", "onTopPlatform": true },
+    { "x": 1350, "y": 254, "type": "signRun", "onTopPlatform": true },
     { "x": 1400, "y": 522, "type": "bushButterfly", "gif": true, "front": true },
     { "x": 1500, "y": 412, "type": "palm1", "onTopPlatform": true, "big": true },
     { "x": 1525, "y": 522, "type": "bush", "front": true },
@@ -57,9 +57,9 @@
     { "x": 4500, "y": 392, "type": "favelaHouse1", "big": true }
   ],
   "pexeira": [
-    { "x": 1700, "y": 372, "vx": -2 },
-    { "x": 3550, "y": 372, "vx": -4 },
-    { "x": 3550, "y": 372, "vx": 4 }
+    { "x": 1700, "y": 342, "vx": -2 },
+    { "x": 3550, "y": 342, "vx": -4 },
+    { "x": 3550, "y": 342, "vx": 4 }
   ],
   "rosal": [
     { "x": 3550, "y": 372, "cooldown": 90, "bulletTime": 80 }
