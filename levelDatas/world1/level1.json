@@ -35,7 +35,7 @@
     { "x": 1025, "y": 522, "type": "bushFlower", "front": true },
     { "x": 1150, "y": 522, "type": "bush", "front": true },
     { "x": 1275, "y": 522, "type": "bushFlower", "front": true },
-    { "x": 1350, "y": 382, "type": "signRun", "onTopPlatform": true },
+    { "x": 1350, "y": 318, "type": "signRun", "onTopPlatform": true },
     { "x": 1400, "y": 522, "type": "bushButterfly", "gif": true, "front": true },
     { "x": 1500, "y": 412, "type": "palm1", "onTopPlatform": true, "big": true },
     { "x": 1525, "y": 522, "type": "bush", "front": true },
