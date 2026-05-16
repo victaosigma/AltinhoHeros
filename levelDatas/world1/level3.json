@@ -4,9 +4,9 @@
   "skySrc": "https://i.imgur.com/ue0wRMU.png",
   "player": { "x": 150, "y": 574 },
   "startPlat": { "x": 0, "y": 642 },
-  "exitPlat": { "x": 24000, "y": 522 },
+  "exitPlat": { "x": 20260, "y": 568 },
   "checkpoint": { "x": 5360, "y": 602 },
-  "tomato": { "x": 24000, "y": 592 },
+  "tomato": { "x": 15160, "y": -8 },
   "platforms": [
     { "x": -100, "y": 662, "w": 1600, "type": "dirt2" },
     { "x": 1490, "y": 622, "w": 200, "type": "dirt2" },
@@ -27,20 +27,38 @@
     { "x": 12260, "y": 348, "w": 50, "type": "wood1", "breakable": true },
     { "x": 12060, "y": 638, "w": 1100, "type": "dirt2" },
     { "x": 11690, "y": 368, "w": 400, "type": "dirt2" },
-    { "x": 13140, "y": 308, "w": 1100, "type": "dirt2" }
+    { "x": 13710, "y": 548, "w": 300, "type": "dirt2" },
+    { "x": 13140, "y": 308, "w": 600, "type": "dirt2" },
+    { "x": 14660, "y": 248, "w": 50, "type": "wood1", "breakable": true },
+    { "x": 14360, "y": 548, "w": 600, "type": "dirt2" },
+    { "x": 16160, "y": 508, "w": 800, "type": "dirt2" },
+    { "x": 18660, "y": 208, "w": 50, "type": "wood1", "breakable": true },
+    { "x": 17760, "y": 508, "w": 1000, "type": "dirt2" },
+    { "x": 18960, "y": 548, "w": 500, "type": "dirt2" },
+    { "x": 19660, "y": 588, "w": 1000, "type": "dirt2" }
   ],
   "topPlatforms": [
     { "x": 3110, "y": 482, "w": 150, "type": "dirt2" },
     { "x": 9080, "y": 558, "w": 200, "type": "dirt2" },
     { "x": 8880, "y": 448, "w": 200, "type": "dirt2" },
     { "x": 12840, "y": 418, "w": 200, "type": "dirt2", "stackable": true },
-    { "x": 12740, "y": 528, "w": 400, "type": "dirt2", "stackable": true }
+    { "x": 12740, "y": 528, "w": 400, "type": "dirt2", "stackable": true },
+    { "x": 16460, "y": 178, "w": 200, "type": "dirt2", "stackable": true },
+    { "x": 16360, "y": 288, "w": 400, "type": "dirt2", "stackable": true },
+    { "x": 16260, "y": 398, "w": 600, "type": "dirt2", "stackable": true }
   ],
   "walkways": [
     { "x": 4010, "y": 602, "w": 200, "h": 50, "type": "wood1" },
     { "x": 4360, "y": 602, "w": 300, "h": 50, "type": "wood1" },
     { "x": 4810, "y": 602, "w": 200, "h": 50, "type": "wood1" },
-    { "x": 12060, "y": 338, "w": 400, "h": 70, "type": "dirt2" }
+    { "x": 12060, "y": 338, "w": 400, "h": 70, "type": "dirt2" },
+    { "x": 15210, "y": 528, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 15660, "y": 508, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 15060, "y": 68, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 15510, "y": 68, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 16010, "y": 68, "w": 200, "h": 50, "type": "wood1" },
+    { "x": 17160, "y": 68, "w": 100, "h": 50, "type": "wood1" },
+    { "x": 17160, "y": 488, "w": 400, "h": 50, "type": "wood1" }
   ],
   "props": [
     { "x": 246, "y": 588, "type": "fence" },
@@ -61,9 +79,31 @@
     { "x": 5800, "y": 622, "type": "suburbHouse3", "big": true, "front": true },
     { "x": 6740, "y": 528, "type": "fence", "small": true },
     { "x": 6794, "y": 528, "type": "fence", "small": true },
+    { "x": 6848, "y": 528, "type": "fence", "small": true },
+    { "x": 7148, "y": 528, "type": "suburbHouse1", "big": true },
     { "x": 6660, "y": 528, "type": "mimosa1" },
     { "x": 8380, "y": 494, "type": "mimosa1", "small": true },
-    { "x": 8480, "y": 494, "type": "acacia1" }
+    { "x": 8480, "y": 494, "type": "acacia1" },
+    { "x": 10090, "y": 314, "type": "mimosa1", "big": true },
+    { "x": 10110, "y": 314, "type": "signWarn" },
+    { "x": 11340, "y": 314, "type": "acacia2", "big": true },
+    { "x": 11040, "y": 446, "type": "acacia1", "front": true, "big": true },
+    { "x": 10960, "y": 446, "type": "fence", "front": true },
+    { "x": 11730, "y": 294, "type": "signAbility" },
+    { "x": 13200, "y": 234, "type": "suburbHouse1", "big": true },
+    { "x": 13400, "y": 234, "type": "suburbHouse2", "big": true },
+    { "x": 13910, "y": 734, "type": "signGo", "front": true },
+    { "x": 17860, "y": 434, "type": "suburbHouse1", "big": true },
+    { "x": 18010, "y": 434, "type": "acacia2", "big": true },
+    { "x": 18260, "y": 434, "type": "mimosa1", "big": true },
+    { "x": 18418, "y": 434, "type": "fence" },
+    { "x": 18538, "y": 434, "type": "fence" },
+    { "x": 19060, "y": 474, "type": "suburbHouse1", "big": true },
+    { "x": 19260, "y": 474, "type": "suburbHouse2", "big": true },
+    { "x": 19110, "y": 606, "type": "fence", "front": true },
+    { "x": 19810, "y": 514, "type": "acacia1", "big": true },
+    { "x": 19960, "y": 514, "type": "acacia2", "big": true },
+    { "x": 20120, "y": 646, "type": "mimosa1", "front": true }
   ],
   "powerups": [
     { "x": 5928, "y": 518, "type": "burguer" }
@@ -72,13 +112,20 @@
     { "x": 1200, "y": 562, "vx": -2 },
     { "x": 6770, "y": 512, "vx": -4 },
     { "x": 6870, "y": 512, "vx": -4 },
-    { "x": 6970, "y": 512, "vx": -4 }
+    { "x": 6970, "y": 512, "vx": -4 },
+    { "x": 15405, "y": 418, "vx": -2 },
+    { "x": 18260, "y": 418, "vx": -5 },
+    { "x": 18360, "y": 418, "vx": -5 },
+    { "x": 18460, "y": 418, "vx": -5 }
   ],
   "tongoloide": [
     { "x": 2530, "y": 392, "vx": -4 },
-    { "x": 3220, "y": 372, "vx": "enemy.x-player.x<=500?-3.5:0" }
+    { "x": 3220, "y": 372, "vx": "enemy.x-player.x<=500?-3.5:0" },
+    { "x": 13600, "y": 198, "vx": -4 }
   ],
   "rosal": [
-    { "x": 11440, "y": 298, "cooldown": 30, "bulletTime": 500 }
+    { "x": 11440, "y": 298, "cooldown": 30, "bulletTime": 500 },
+    { "x": 14560, "y": 448, "cooldown": 60, "bulletTime": 500 },
+    { "x": 17200, "y": -38, "cooldown": 30, "bulletTime": 350, "alwaysLoad": true }
   ]
 }
