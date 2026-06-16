@@ -1,7 +1,7 @@
 {
   "music": "favela_ambience",
-  "bgSrc": "https://i.imgur.com/oLEyYTc.png",
-  "skySrc": "https://i.imgur.com/5VHS2zP.png",
+  "bgSrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgSunset.png",
+  "skySrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/skySunset.png",
   "filter": { "r": 207, "g": 130, "b": 173, "a": 0.5 },
   "player": { "x": 150, "y": 374 },
   "startPlat": { "x": 0, "y": 442 },
