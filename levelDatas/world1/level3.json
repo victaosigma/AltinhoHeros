@@ -1,7 +1,7 @@
 {
   "music": "suburbs_shuffle",
-  "bgSrc": "https://i.imgur.com/GrRIjl2.png",
-  "skySrc": "https://i.imgur.com/ue0wRMU.png",
+  "bgSrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/suburb/bgNoon.png",
+  "skySrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/suburb/skyNoon.png",
   "player": { "x": 150, "y": 574 },
   "startPlat": { "x": 0, "y": 642 },
   "exitPlat": { "x": 20260, "y": 568 },
