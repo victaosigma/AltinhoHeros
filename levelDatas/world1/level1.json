@@ -1,7 +1,7 @@
 {
   "music": "favela_ambience",
-  "bgSrc": "assets/images/backgrounds/favela/bgNoon.png",
-  "skySrc": "assets/images/backgrounds/favela/skyNoon.png",
+  "bgSrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgNoon.png",
+  "skySrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/skyNoon.png",
   "player": { "x": 150, "y": 374 },
   "startPlat": { "x": 0, "y": 442 },
   "exitPlat": { "x": 5000, "y": 462 },
