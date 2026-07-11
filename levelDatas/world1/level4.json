@@ -96,7 +96,7 @@
     { "x": 1360, "y": 280, "type": "bushButterfly", "front":true, "gif":true },
     { "x": 3120, "y": -484, "type": "favelaHouse2", "big":true },
     { "x": 3380, "y": -484, "type": "pole1" },
-    { "x": 3420, "y": -366, "type": "signRun", "front":true },
+    { "x": 3420, "y": -366, "type": "signHold", "front":true },
     { "x": 4100, "y": -228, "type": "palm1", "big":true },
     { "x": 5900, "y": 220, "type": "bench1" },
     { "x": 4530, "y": -388, "type": "pole1", "onTopPlatform":true },
