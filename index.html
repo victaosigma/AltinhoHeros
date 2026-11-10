@@ -189,13 +189,42 @@ canvas {
 <script>
 // Level Datas
 
-const temporaryData = undefined
+const temporaryData = {
+  music: "boss_bugga",
+  bgSrc: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgDusk.png",
+  skySrc: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/suburb/skyDusk.png",
+  filter: { r:210, g:156, b:230, a:0.6 },
+  lockX:390,
+  lockY:670,
+  player: { x: 345, y: 560 },
+  startPlat: { x: 9000, y: 442 },
+  exitPlat: { x: 9000, y: 462 },
+  checkpoint: { x: 9000, y: 422 },
+  tomato: { x: 9000, y: 232 },
+
+  platforms: [
+    { x: -100, y: 670, w: 600, type: "stone1" },
+  ],
+  props:[
+    { x: -20, y: 600, type: "favelaHouse1", big: true },
+    { x: 50, y: 600, type: "favelaHouse3", big: true },
+    { x: 365, y: 600, type: "pole1" },
+    { x: 18, y: 600, type: "bench1" },
+    { x: 170, y: 650, type: "sergWall", big: true },
+    { x: 150, y: 600, type: "fridge" },
+    { x: 275, y: 575, type: "deepFryer" },
+    { x: 230, y: 600, type: "sergFear", gif:true },
+    { x: 170, y: 650, type: "sergTruck", big: true },
+    { x: 215, y: 577, type: "condiments" },
+  ],
+  boss:1
+}
 
 const gymData = {
   music: "gym_grind",
   bgSrc: "",
   skySrc: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/gym.png",
-  lockCamera:true,
+  lockX:390,
   lockY:670,
   startDialog:"gym",
   coinMod:0,
@@ -226,7 +255,7 @@ const sergData = {
   bgSrc: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgDusk.png",
   skySrc: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/suburb/skyDusk.png",
   filter: { r:210, g:156, b:230, a:0.6 },
-  lockCamera:true,
+  lockX:390,
   lockY:670,
   startDialog:"serg",
   coinMod:0,
@@ -975,7 +1004,7 @@ function ability(){
   }
   else if(player.onGround && !player.abilityCooldown && player.mode === "bigJeff"){
         //audios.jeffAbility.play()
-        player.state = "ability"
+        player.state = "special"
         player.animFrame = 0
         
         shakeCamera(60,10)
@@ -1036,10 +1065,12 @@ function ability(){
 
 let scrollY=0
 let toggles=[]
-const optionsBoxSize=1000
+let sliders=[]
+const optionsBoxSize=5000
 const gameOptions={
-  audio:{volume:1,slowed:false},
-  visual:{hitbox:false}
+  audio:{volume:1,mute:false,water:true,slowed:false},
+  visual:{hitbox:false,particles:true,shake:true,water:true,lights:true,props:true},
+  controls:{joystick:false}
 }
 let optionsStateTog=0
 function options(){
@@ -1058,8 +1089,6 @@ function initialization(){
     initialized = true
 
     audioCtx.resume()
-
-    audioFilter.muted = false
     audioFilter.update()
   }
   
@@ -1103,6 +1132,9 @@ function initialization(){
 }
 
 let lastTouchY=0
+let lastTouchX=0
+let usingSlider=false
+let activeSlider=null
 document.addEventListener("touchstart", (e) => {
   const touch=e.touches[0]
   const rect=c.getBoundingClientRect()
@@ -1114,20 +1146,66 @@ document.addEventListener("touchstart", (e) => {
     for(const toggle of toggles){
       if(x>=toggle.x&&x<=toggle.x+50&&y>=toggle.y+scrollY&&y<=toggle.y+16+scrollY){
         const value=gameOptions[toggle.cat]?.[toggle.field]
-        gameOptions[toggle.cat][toggle.field]=!value
+        gameOptions[toggle.cat][toggle.field]=(value===true)
+      }
+    }
+    usingSlider=false
+    for(const slider of sliders){
+      if(x>=slider.x&&x<=slider.x+slider.w&&y>=slider.y+scrollY&&y<=slider.y+slider.h+scrollY){
+        const per=(x-slider.x)/slider.w
+        gameOptions[slider.cat][slider.field]=Math.floor(per*100)/100
+        usingSlider=true
+        activeSlider=slider
+        break
       }
     }
   }
   lastTouchY=touch.clientY
+  lastTouchX=touch.clientX
 })
-document.addEventListener("touchmove", (e) => {
-    if(state!=="options")return
-    const currentTouchY = e.touches[0].clientY
-    const deltaY = lastTouchY - currentTouchY
+
+c.addEventListener("pointerdown",(e)=>{
+  const rect=c.getBoundingClientRect()
+
+  const x=(e.clientX-rect.left)*(c.width/rect.width)
+  const y=(e.clientY-rect.top)*(c.height/rect.height)
+  if(state==="startScreen"||state==="gameover")initialization()
+  else if(state==="options"){
+    for(const toggle of toggles){
+      if(x>=toggle.x&&x<=toggle.x+50&&y>=toggle.y+scrollY&&y<=toggle.y+16+scrollY){
+        const value=gameOptions[toggle.cat]?.[toggle.field]
+        gameOptions[toggle.cat][toggle.field]=!value
+      }
+    }
+    for(const slider of sliders){
+      if(x>=slider.x&&x<=slider.x+slider.w&&y>=slider.y+scrollY&&y<=slider.y+slider.h+scrollY){
+        const per=(x-slider.x)/slider.w
+        gameOptions[slider.cat][slider.field]=Math.floor(per*100)/100
+      }
+    }
+  }
+})
+
+c.addEventListener("touchmove",(e)=>{
+  if(state!=="options")return
+  const touch=e.touches[0]
+  const rect=c.getBoundingClientRect()
+  const x=(touch.clientX-rect.left)*(c.width/rect.width)
+  const currentTouchY=touch.clientY
+
+  if(usingSlider&&activeSlider){
+    const per=clamp(0,1,(x-activeSlider.x)/activeSlider.w)
+    gameOptions[activeSlider.cat][activeSlider.field]=Math.floor(per*100)/100
+  }else{
+    const deltaY=lastTouchY-currentTouchY
     scrollY=clamp(-optionsBoxSize+500,100,deltaY*-0.4+scrollY)
-    lastTouchY = currentTouchY
-    e.preventDefault()
-}, { passive: false })
+  }
+
+  lastTouchY=currentTouchY
+  lastTouchX=touch.clientX
+
+  e.preventDefault()
+},{passive:false})
 
 document.addEventListener("keydown", () => {
   if (state === "startScreen" || state === "gameover")initialization()
@@ -1274,8 +1352,15 @@ function shakeCamera(time,intensity){
     shakeStrength = intensity ?? 2
 }
 
+function applyKnockback(strength,time,applyVx=false){
+    player.knockStre=strength
+    player.knockTime=time
+    player.knockTimeF=time
+    player.knockApplyVx=applyVx
+}
+
 function toggleNpc() {
-     player.w = 21
+     player.w = 28
      player.h = 88
      player.mode = "npc"
 }
@@ -1527,6 +1612,7 @@ function spawnEnemy(array,pos,options={}){
 }
 
 function die(options={}){
+    if(player.onExit)return
     if(!options.ignoreImmortal&&player.immortal||player.dead)return
     
     if(options.cause==="fell"){
@@ -1587,8 +1673,17 @@ function die(options={}){
     }, 5000)
 }
 
-function exit(){
+function exit(options={}){
     stopSounds()
+    if(options.keepSpeed!==true){
+      player.knockStre=0
+      player.knockTime=0
+      player.knockTimeF=0
+      player.vx=0
+      player.pastelBoost=0
+    }
+    
+    if(player.dead)return
     killAllEnemies()
     audios.victory.play()
     
@@ -1625,13 +1720,14 @@ function goToMap(){
 }
 
 // reset level
-let player, prevFramePlayer,dialog,checkpoint,platforms,topPlatforms, walkways,houses,enemiesPexeira,enemiesRosal,enemiesTongoloide,enemiesMamute,enemiesFeixe,enemiesSnerm,gymSnerm,tomato,pasteis,powerups, props,lights,bullets, particles, climate, flags
+let player, prevFramePlayer,dialog,checkpoint,platforms,topPlatforms, walkways,houses,enemiesPexeira,enemiesRosal,enemiesTongoloide,enemiesMamute,enemiesFeixe,enemiesSnerm,gymSnerm,tomato,pasteis,powerups, props,lights,bullets, particles, climate, flags, boss, puddles
 let cameraX=0
 let cameraY=0
 let shakeTime = 0
 let shakeStrength = 0
 let flipPlayer = false
 let gameTime = 0
+let levelTime = 0
 let lives = 0
 let coins = 0
 let inventory = null
@@ -1659,6 +1755,7 @@ keys.up=false
 keys.down=false
 keys.jump=false
 keys.pause=false
+levelTime = 0
 audioFilter.reset()
 
 bgImg.src = levelData.bgSrc || ""
@@ -1668,10 +1765,15 @@ musics[levelData.music].play()
 player={
   x: checkpoints[level] ? Math.round(levelData.checkpoint?.x + 145/2) : levelData.player?.x ?? 0,
   y: checkpoints[level] ? levelData.checkpoint?.y - 90 : levelData.player?.y ?? 0,
-  w:21,
+  w:28,
   h:88,
   vx:0,
   vy:0,
+  
+  knockStre:0,
+  knockTime:0,
+  knockTimeF:0,
+  knockApplyVx:true,
   
   onGround:false,
   onTopPlatform:false,
@@ -1854,13 +1956,37 @@ enemiesSnerm = (levelData.snerm || []).map(s => ({
 
 gymSnerm = []
 
+const bossId=levelData.boss
+if(bossId){
+  switch(bossId){
+    case 1:
+    boss={
+      id:bossId,
+      health:5,
+      dead:false,
+      
+      x:-75,
+      y:352,
+      w:210,
+      h:318,
+      
+      immortal:0,
+      cool:200,
+      pastel:650,
+      state:"idle",
+      frame:0
+    }
+    break
+  }
+}else boss=null
+
 items = (levelData.items || []).map(i => ({
   x:i.x,
   y:i.y,
   baseY:i.y,
   type:i.type,
-  w:20,
-  h:20,
+  w:16*objScale,
+  h:16*objScale,
 }))
 
 tomato = tomatoes[level] ? {} :
@@ -1868,16 +1994,16 @@ tomato = tomatoes[level] ? {} :
     x:levelData.tomato?.x??999999,
     y:levelData.tomato?.y??999999,
     baseY:levelData.tomato?.y??999999,
-    w:20,
-    h:20
+    w: 16*objScale,
+    h: 16*objScale
 }
 
 pasteis = (levelData.pasteis || []).map(b => ({
   x:b.x,
   y:b.y,
   baseY:b.y,
-  w:20,
-  h:20,
+  w:16*objScale,
+  h:16*objScale,
   active:true
 }))
 
@@ -1885,8 +2011,8 @@ powerups = (levelData.powerups || []).map(b => ({
   x:b.x,
   y:b.y,
   baseY:b.y,
-  w:20,
-  h:20,
+  w:16*objScale,
+  h:16*objScale,
   type:b.type,
   onEat: b.type === "burguer" ? toggleJeff : toggleNpc,
   newMode: b.ignoreMode ? "none" : b.type === "burguer" ? "bigJeff" : "npc",
@@ -1913,6 +2039,7 @@ props = (levelData.props || []).map(p => {
 })
 
 bullets=[]
+puddles=[]
 particles=[]
 climate=[]
 
@@ -2500,6 +2627,7 @@ function update(){
   
   if (state === "startScreen" || state === "map") return
   gameTime++
+  levelTime++
   idleTime++
   if(player.abilityCooldown)player.abilityCooldown--
   preservedVx = Math.abs(player.vx)
@@ -2510,7 +2638,7 @@ function update(){
  
   if (player.dead && player.y < 670) player.state = "dead"
   else if (player.onExit) player.state = "comemorating"
-  else if(player.state === "ability"){}
+  else if(player.state === "special"){}
   else if (player.vy && player.vy > 0) {
         idleTime = 0
         player.state = "falling"
@@ -2530,25 +2658,32 @@ else {
     }
 }
 
+flipPlayer = player.vx < 0 ? true : player.vx > 0 ? false : flipPlayer
+if(boss){
+  if(levelTime===22){
+    audios.damn.volume=3
+    audios.damn.play()
+  }
+  if(levelTime<90){
+    player.state="specialN"
+    if(boss.id===1)flipPlayer=true
+  }
+}
+
 const waterLevel=levelData?.water?.y??Infinity
 const depth=Math.max((player.y+player.h)-waterLevel,0)
 const waterDrag=Math.max(0.85,1-depth/player.h)
-if(depth>player.h){
- audioFilter.frequency=800
- audioFilter.volume=0.65
- audioFilter.playbackRate=0.85
- audioFilter.detune=-300
- audioFilter.update()
-}else audioFilter.reset()
+if(depth>player.h)audioFilter.waterEffect()
+else audioFilter.reset()
 
 checkCodes()
   
 player.vx=0
-if(keys.left && player.move)player.vx = (keys["run"] ? -2 : 0) + (player.mode === "bigJeff" ? -10 : player.immortal ? -6 : -4)
-if(keys.right && player.move) player.vx = (keys["run"] ? 2 : 0) + (player.mode === "bigJeff" ? 10 : player.immortal ? 6 : 4)
-if(depth)player.vx+=-(levelData?.water?.flow??0)
+if(keys.left && player.move && !player.state.endsWith("N"))player.vx = (keys["run"] ? -2 : 0) + (player.mode === "bigJeff" ? -10 : player.immortal ? -6 : -4)
+if(keys.right && player.move && !player.state.endsWith("N")) player.vx = (keys["run"] ? 2 : 0) + (player.mode === "bigJeff" ? 10 : player.immortal ? 6 : 4)
+if(depth)player.x-=levelData?.water?.flow??0
 
-if(keys.jump&&(player.onGround || player.pastelBoost||depth>6) && player.move){
+if(keys.jump&&(player.onGround || player.pastelBoost||depth>6) && player.move && !player.state.endsWith("N")){
 if(player.mode === "deives") audios.jump.play()
 player.vy=-13
 player.onGround=false
@@ -2557,7 +2692,7 @@ player.onStackablePlatform=false
 }
 
 if(!keys.hold&&player.holding){
-    items.push({ x:player.x+player.w/2, y:player.y+player.h-42, baseY:player.y+player.h-42, type: player.holding, w:20,h:20 })
+    items.push({ x:player.x+player.w/2, y:player.y+player.h-42, baseY:player.y+player.h-42, type: player.holding, w:16*objScale,h:16*objScale })
     player.holding=null
 }
 
@@ -2586,15 +2721,17 @@ player.vx*=waterDrag
 player.vy*=waterDrag
 
 player.pastelBoost=player.pastelBoost>5?player.pastelBoost-5:0
-player.x+=player.pastelBoost?(player.vx + player.pastelBoost)*(flipPlayer ? -1 : 1):player.vx
+if(player.knockTime){
+    player.knockTime--
+    player.x+=(player.knockTime/player.knockTimeF)*player.knockStre
+    if(player.knockApplyVx)player.x+=player.pastelBoost?(player.vx + player.pastelBoost)*(flipPlayer ? -1 : 1):player.vx
+}else player.x+=player.pastelBoost?(player.vx + player.pastelBoost)*(flipPlayer ? -1 : 1):player.vx
 if (player.x < 0) player.x = 0
-if (levelData.lockCamera&&player.x+player.w > 390) player.x = 390 - player.w
+if (player.x+player.w>levelData.lockX)player.x=levelData.lockX-player.w
 player.y+=player.vy
 player.onGround=false
 player.onTopPlatform=false
 player.onStackablePlatform=false
-
-flipPlayer = player.vx < 0 ? true : player.vx > 0 ? false : flipPlayer
 
 if(flags.battleArena){
     const allEmpty = enemiesPexeira.length===0 &&
@@ -2644,7 +2781,7 @@ if(flags.battleArena){
 } else if(flags.snermDodge){
     const snermsTop=gymSnerm.filter(s=>(s.y+s.h)<200).length===gymSnerm.length
     if(snermsTop)despawnAllEnemies()
-    const mayStart=snermsTop&&!flags.baRoundDelay
+    const mayStart=snermsTop&&!flags.baRoundDelay&&!player.dead
     const maxRound=10
     
     if(mayStart)flags.baRound++
@@ -2660,12 +2797,15 @@ if(flags.battleArena){
       flags.baRound=0
       keys.jump=false
     }else if(mayStart){
-      let enemies=flags.baRound
-      for(let i=0; i<390; i+=40){
-        if(Math.random()>0.5&&enemies){
-          spawnEnemy(gymSnerm,{ x:i,y:670 },{cooldown:Math.round(((maxRound-flags.baRound)/maxRound)*53+15)})
-          enemies--
-        }
+      const enemies=Math.min(flags.baRound,8)
+      const pos=[]
+      for(let e=0;e<enemies;e++){
+        const sortI=()=>{ const i=sort(0,9); if(pos[i])sortI(); else pos[i]=true }
+        sortI()
+      }
+      for(let i=0;i<10;i++){
+        if(!pos[i])continue
+        spawnEnemy(gymSnerm,{x:i*40,y:670},{cooldown:Math.round(((maxRound-flags.baRound)/maxRound)*53+15)})
       }
       flags.baRoundDelay=50
     } else if(flags.baRoundDelay>0&&snermsTop)flags.baRoundDelay--
@@ -3090,6 +3230,91 @@ enemiesRosal.forEach((enemy,i) => {
   }
 
 })
+/*
+enemy.cool--
+  if (enemy.cool <= 0) {
+    bullets.push({ x: enemy.x+(enemy.flipped?10+enemy.w:-10), y: enemy.y + 5, w: 16, h: 8, vx: enemy.flipped?6:-6, vy: 0, time: 0, maxTime: enemy.bulletTime, alwaysLoad: enemy.alwaysLoad })
+    enemy.cool = enemy.baseCool
+    
+    enemy.state = "walking"
+    enemy.animFrame = 0
+  }
+
+  if (enemy.state === "walking") {
+    enemy.animFrame += 0.15
+
+    if (enemy.animFrame >= 4) {
+      enemy.state = "idle"
+      enemy.animFrame = 0
+    }
+    */
+
+if(boss){
+  switch(boss.id){
+    case 1:{
+      if(boss.dead){
+        if(Math.floor(boss.frame)%2===0){
+          createParticle("fuzzSmoke", 4, Math.max(0,boss.x+Math.floor(Math.random()*boss.w)), boss.y+Math.floor(Math.random()*boss.h), sort(0,1,true), sort(0,1,true))
+          createParticle("woodBreak", 4, Math.max(0,boss.x+Math.floor(Math.random()*boss.w)), boss.y+Math.floor(Math.random()*boss.h), sort(0,1,true), sort(0,1,true))
+        }
+        break
+      }
+      if(boss.immortal)boss.immortal--
+      else{
+        if(boss.state==="protect")boss.state="idle"
+        if(boss.cool)boss.cool--
+        else{
+          bullets.push({skin:"oil",x:boss.x+boss.w-18,y:boss.y+boss.h-156,w:24,h:12,vx:4,vy:sort(1,5),time:0,maxTime:100,alwaysLoad:true})
+          boss.frame=0
+          const coolLow=(2.5-0.5*boss.health)||1
+          boss.cool=Math.floor(130/coolLow)
+          boss.state="shoot"
+        }
+        
+        if(boss.pastel)boss.pastel--
+        else{
+          boss.pastel=650
+          const pastelSize=16*objScale
+          pasteis.push({x:266,y:540,baseY:540,w:pastelSize,h:pastelSize,active:true})
+          createParticle("smoke", 4, 300, 540, sort(-2,2,true), sort(-2,2,true))
+        }
+      }
+      if(boss.state==="shoot"&&boss.frame>=4){
+        boss.state="idle"
+        boss.frame=0
+      }
+      
+      if(rect(player,boss)){
+        player.x=boss.x+boss.w
+        if(!player.immortal){
+          die({ cause:"boss",coinLoss:10 })
+          boss.immortal=0
+          break
+        }
+        
+        applyKnockback(17,30)
+        player.immortalTime=10
+        createParticle("checkpointStars", 5, boss.x+boss.w/2, boss.y+boss.h/2, sort(-1,1,true), sort(-1,1,true))
+        bullets=[]
+        puddles=[]
+        if(boss.immortal)break
+        if(boss.health){
+         boss.health--
+         boss.immortal=75
+         boss.state="protect"
+        }
+        if(!boss.health){
+          boss.dead=true
+          boss.state="dead"
+          boss.immortal=0
+          player.move=false
+          setTimeout(()=>{ exit({keepSpeed:true}) },3000)
+        }
+      }
+    }
+    break
+  }
+}
 
 for (let i = bullets.length - 1; i >= 0; i--) {
   const b = bullets[i]
@@ -3099,6 +3324,21 @@ for (let i = bullets.length - 1; i >= 0; i--) {
   if (b.time >= b.maxTime) {
     bullets.splice(i, 1)
     continue
+  }
+  if(b.skin==="oil"){
+    if(!(b.time%4)){
+      createParticle("fuzzF", 4, b.x, b.y+b.h+16, sort(0,1,true), sort(0,1,true))
+      createParticle("fuzzSmoke", 4, b.x, b.y+b.h+16, sort(0,1,true), sort(0,1,true))
+    }
+    const plat=platforms.filter(p=>p.x<=b.x&&p.x+p.w>=b.x+b.w)[0]
+    if(b.y+b.h>=plat?.y){
+      puddles.push({time:60,baseTime:60,x:b.x-27,y:plat.y-16,w:54,h:16,type:"oil"})
+      audios.fry.pause()
+      audios.fry.currentTime=0
+      audios.fry.play()
+      bullets.splice(i, 1)
+      continue
+    }
   }
   b.x += b.vx
   b.y += b.vy
@@ -3112,6 +3352,20 @@ for (let i = bullets.length - 1; i >= 0; i--) {
        bullets.splice(i, 1)
        die({ cause:"bullet", coinLoss:10 })
     }
+  }
+}
+
+for (let i = puddles.length - 1; i >= 0; i--) {
+  const p = puddles[i]
+  p.time--
+  if(!p.time){
+    puddles.splice(i,1)
+    continue
+  }
+  if(rect(player,p)&&player.mode!=="bigJeff")die({cause:"puddle",coinLoss:10})
+  if(p.type==="oil"&&!(p.time%5)){
+    createParticle("fuzz", 4, p.x+Math.random()*p.w, p.y+8+Math.random()*8, sort(0,1,true), sort(0,-1,true))
+    createParticle("fuzzSmoke", 4, p.x+Math.random()*p.w, p.y+8+Math.random()*8, sort(-1,1,true), sort(0,-1,true))
   }
 }
 
@@ -3197,10 +3451,12 @@ const postPlat=platforms?.filter(p=>p.x+p.w>=player.x+player.w)?.sort((a,b)=>a.x
 if(player.y>Math.min(Math.max(prevPlat?.y,postPlat?.y),470)+200)die({ cause:"fell", coinLoss:10, ignoreImmortal:true })
 
 if(shakeTime > 0) shakeTime--
-else shakeStrength = 0
+else shakeStrength=0
+if(!gameOptions.visual.shake)shakeStrength=0
 
 cameraX=player.x-c.width/2 + (Math.random() - 0.5)*shakeStrength
-if(levelData.lockCamera || cameraX<0)cameraX=0
+if(cameraX<0)cameraX=0
+if(cameraX>levelData.lockX-390)cameraX=levelData.lockX-390
 
 cameraY=player.y<670?player.y-c.height/2  + (Math.random() - 0.5)*shakeStrength:cameraY
 if(levelData.lockY)cameraY=levelData.lockY-player.h-c.height/2
@@ -3286,19 +3542,27 @@ const enemyImgs = {
     pexeira: new Image(),
     rosal: new Image(),
     bullet: new Image(),
+    bulletOil: new Image(),
     tongoloide: new Image(),
     mamute: new Image(),
     feixe: new Image(),
     snerm: new Image(),
+    kingPastelo: new Image(),
+    puddle: new Image(),
+    oilPuddle: new Image(),
 }
 
 enemyImgs.pexeira.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/pexeira.png"
 enemyImgs.rosal.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/rosal.png"
 enemyImgs.bullet.src = "https://i.imgur.com/Vvvi6uj.png"
+enemyImgs.bulletOil.src = "https://i.imgur.com/qAJmvqr.png"
 enemyImgs.tongoloide.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/tongoloide.png"
 enemyImgs.mamute.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/mamute.png"
 enemyImgs.feixe.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/feixe.png"
 enemyImgs.snerm.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/enemy/snerm.png"
+enemyImgs.kingPastelo.src = "https://i.imgur.com/UbCdfRw.png"
+enemyImgs.puddle.src = "https://i.imgur.com/bD8IOtg.png"
+enemyImgs.oilPuddle.src = "https://i.imgur.com/bD8IOtg.png"
 
 const playersImgs = {
     selector: new Image(),
@@ -3344,6 +3608,7 @@ const propsSrc = {
   dumbbellRack: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/furniture/dumbbellRack.png",
   gh: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/characters/gh.png",
   serg: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/characters/serg.png",
+  sergFear: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/characters/sergFear.png",
   sergTruck: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/structures/sergTruck.png",
   sergWall: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/structures/sergWall.png",
   condiments: "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/props/extra/condiments.png",
@@ -3367,12 +3632,18 @@ const particleImgs = {
     dirtSplash: new Image(),
     woodBreak: new Image(),
     smoke: new Image(),
+    fuzz: new Image(),
+    fuzzF: new Image(),
+    fuzzSmoke: new Image(),
 }
 
 particleImgs.checkpointStars.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/particles/checkpointStars.png"
 particleImgs.dirtSplash.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/particles/dirtSplash.png"
 particleImgs.woodBreak.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/particles/woodBreak.png"
 particleImgs.smoke.src = "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/particles/smoke.png"
+particleImgs.fuzz.src = "https://i.imgur.com/eb23Yhd.png"
+particleImgs.fuzzF.src = "https://i.imgur.com/FBdOH2T.png"
+particleImgs.fuzzSmoke.src = "https://i.imgur.com/qLy3XVh.png"
 
 const itemsImgs = {
     none: new Image(),
@@ -3474,14 +3745,32 @@ const audioFilter = {
         })
     },
     
+    waterEffect(){
+      if(!gameOptions.audio.water)this.reset()
+      else{
+        if(gameOptions.audio.slowed){
+          this.frequency=480
+          this.volume=(gameOptions?.audio?.volume??1)*0.58
+          this.playbackRate=0.55
+          this.detune=-300
+          this.pan=0
+          this.Q=0.8
+          this.filterType="lowpass"
+        }else{
+          this.frequency=800
+          this.volume=(gameOptions?.audio?.volume??1)*0.65
+          this.playbackRate=0.85
+          this.detune=-300
+          this.pan=0
+          this.Q=1
+          this.filterType="lowpass"
+        }
+        if(gameOptions?.audio?.mute)this.volume=0
+        this.update()
+      }
+    },
+    
     reset(){
-      this.frequency=20000
-      this.volume=gameOptions?.audio?.volume??1
-      this.playbackRate=1
-      this.detune=0
-      this.pan=0
-      this.Q=1
-      this.filterType="lowpass"
       if(gameOptions.audio.slowed){
         this.frequency=12000
         this.volume=gameOptions?.audio?.volume*0.9??0.9
@@ -3490,7 +3779,16 @@ const audioFilter = {
         this.pan=0
         this.Q=0.8
         this.filterType="lowpass"
+      }else{
+        this.frequency=20000
+        this.volume=gameOptions?.audio?.volume??1
+        this.playbackRate=1
+        this.detune=0
+        this.pan=0
+        this.Q=1
+        this.filterType="lowpass"
       }
+      if(gameOptions?.audio?.mute)this.volume=0
       
       this.update()
     }
@@ -3503,9 +3801,11 @@ let audioUrls = {
     defeat:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/defeat.m4a',
     checkpoint:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/checkpoint.m4a',
     victory:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/victory.m4a',
+    damn:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/damn.m4a',
     //jump:'https://testeaudioretro-ycq241iayx.edgeone.app/jump.m4a',
     pastelEat:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/eat.m4a',
     pastelDash:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/npc/dash.m4a',
+    
     pexeira:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/pexera.m4a',
     tongoloideHurt:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/tongoloideHurt.m4a',
     shot:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/shot.m4a',
@@ -3513,9 +3813,12 @@ let audioUrls = {
     feixeHurt:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/feixeHurt.m4a',
     snermAttack:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/snermAttack.m4a',
     snermHurt:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/enemies/snermHurt.m4a',
+    
     jeffImpact:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/bigJeff/impact.m4a',
     //jeffAbility:'https://bigjeffsounds-i1b1sup48r.edgeone.app/jeffSkill.MP4',
-    jeffBounce:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/bigJeff/attack.m4a'
+    jeffBounce:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/bigJeff/attack.m4a',
+    
+    fry:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/audios/misc/fry.m4a'
 }
 
 let musicUrls = {
@@ -3524,7 +3827,8 @@ let musicUrls = {
     suburbs_shuffle:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/suburbs_shuffle.mp3',
     gym_grind:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/gym_grind.mp3',
     sergs_soundtrack:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/sergs_soundtrack.mp3',
-    splash_swing:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/splash_swing.mp3'
+    splash_swing:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/splash_swing.mp3',
+    boss_bugga:'https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/musics/boss_bugga.mp3'
 }
 
 const assets = [
@@ -3867,7 +4171,7 @@ function drawEnemy(enemy,options={}) {
 
     const frames = 4
     const frame = Math.floor(enemy.animFrame || 0) % frames
-    const animY = isDead ? 65 : isIdle ? 128 : 0
+    const animY = isDead ? 65 : isIdle ? 129 : 0
 
     const drawSize = size * eneScale / 2
     const drawX = (options.center!=="false"?enemy.x - cameraX + enemy.w / 2 - drawSize / 2:enemy.x - cameraX)+(options.offsetX??0)
@@ -3877,7 +4181,7 @@ function drawEnemy(enemy,options={}) {
     const flipY=options.flipY>0?-1:1
 
     ctx.save()
-
+    
     if (!isDead && (flipX<0||flipY<0)) {
         ctx.translate(drawX+(flipX<0?drawSize:0), drawY+(flipY<0?drawSize:0))
         ctx.scale(flipX, flipY)
@@ -3920,44 +4224,38 @@ function drawPlayer(player) {
     const size = 64
     const frames = 4
     const frame = Math.floor(player.animFrame || 0) % frames
+    const state=player.state.replace("N","")
     
-    const isUsingAbility = player.state === "ability"
-    if(isUsingAbility&&player.animFrame>4){
+    const isUsingAbility = state === "special"
+    if(player.mode!=="npc"&&isUsingAbility&&player.animFrame>4){
           idleTime = 0
           player.state = "idle"
     }
     
-    const isIdle = player.state === "idle"
-    const isIdleLong = player.state === "idle_long"
-    const isWalking = player.state === "walking"
-    const isJumping = player.state === "jumping"
-    const isFalling = player.state === "falling"
-    const isDead = player.state === "dead"
-    const isComemorating = player.state === "comemorating"
-    
-    const animY = isIdle ? 0 : isIdleLong ? 64 : isWalking ? 128 : isJumping ? 192 : isFalling ? 256 : isDead ? 320  : isComemorating ? 384 : isUsingAbility ? 448 : 0
+    const animY=(()=>{
+      switch(state){
+        case "idle_long": return 65; break;
+        case "walking": return 129; break;
+        case "jumping": return 193; break;
+        case "falling": return 257; break;
+        case "dead": return 321; break;
+        case "comemorating": return 385; break;
+        case "special": return 449; break;
+        default: return 0; break;
+      }
+    })()
 
     const drawSize = size * eneScale / 2
-    const drawX = player.x - cameraX + player.w / 2 - drawSize / 2.2
+    const drawX = player.x - cameraX + player.w / 2 - drawSize / 2
     const drawY = player.y + player.h - drawSize - cameraY
 
     ctx.save()
-
-    if (!isDead && flipPlayer) {
-        ctx.translate(drawX + drawSize, drawY)
-        ctx.scale(-1, 1)
-        ctx.drawImage(
-            img,
-            frame * size,
-            animY,
-            size,
-            size,
-            0,
-            0,
-            drawSize,
-            drawSize
-        )
-    } else {
+    
+        if(!player.dead &&flipPlayer){
+          ctx.translate(drawX+drawSize/2,0)
+          ctx.scale(-1, 1)
+          ctx.translate(-(drawX+drawSize/2),0)
+        }
         ctx.drawImage(
             img,
             frame * size,
@@ -3969,11 +4267,10 @@ function drawPlayer(player) {
             drawSize,
             drawSize
         )
-    }
-
     ctx.restore()
-    
-    player.animFrame = (player.animFrame || 0) + (isWalking ? preservedVx*0.0375 : 0.15)
+   
+    const animSpeed = state==="walking" ? preservedVx*0.0375 : state==="special"&&player.mode==="npc" ? 0.6 : 0.15
+    player.animFrame = (player.animFrame || 0) + animSpeed
     
     const holdingImg = itemsImgs[player?.holding]??itemsImgs.none
     const holdX = player.mode==="npc"||player.mode==="bigJeff"?drawX+12.5*eneScale:drawX
@@ -4235,60 +4532,88 @@ function drawUi(){
 function parseUiPiece(txt){
     let params=[]
     if(txt==="divider()")params[0]=txt.slice(0,-2)
+    else if(txt?.startsWith("space(")&&txt?.endsWith(")")){
+      params[0]="space"
+      params[1]=txt.slice(6,-1)
+    }
     else if(txt?.startsWith("header(")&&txt?.endsWith(")")){
       params[0]="header"
       params[1]=txt.slice(7,-1)
+    }
+    else if(txt?.startsWith("text(")&&txt?.endsWith(")")){
+      params[0]="text"
+      params[1]=txt.slice(5,-1)
     }
     else if(txt?.startsWith("toggle(")&&txt?.endsWith(")")){
       params=txt.slice(7,-1).split(",")
       params.unshift("toggle")
     }
+    else if(txt?.startsWith("slider(")&&txt?.endsWith(")")){
+      params=txt.slice(7,-1).split(",")
+      params.unshift("slider")
+    }
     return params
 }
 
 const optionsTxts=[
+  "header(Controls)",
+  "space(20)",
+  "text(Move->WASD)",
+  "text(Move->Arrows)",
+  "space(20)",
+  "text(Jump->Space)",
+  "text(Jump->Enter)",
+  "space(20)",
+  "text(Run->Control)",
+  "text(Run->Shift)",
+  "text(Run->CapsLock)",
+  "text(Toggle Run->R)",
+  "space(20)",
+  "text(Pickup Items->E)",
+  "text(Pickup Items->F)",
+  "text(Pickup Items->H)",
+  "space(20)",
+  "text(Ability->Q)",
+  "text(Pause->P)",
+  "text(Pause->Esc)",
+  "space(40)",
+  "toggle(Joystick (mobile),controls,joystick)",
+  "divider()",
   "header(Audio)",
+  "toggle(Water Filter,audio,water)",
   "toggle(Slowed+Reverb,audio,slowed)",
-  "toggle(Slowed+Reverb,audio,slowed)",
+  "toggle(Mute,audio,mute)",
+  "slider(Volume,audio,volume)",
   "divider()",
   "header(Visual)",
+  "toggle(Level Lights,visual,lights)",
+  "toggle(Water Distortion,visual,water)",
+  "toggle(Show Particles,visual,particles)",
+  "toggle(Scenario Props,visual,props)",
+  "toggle(Screen Shake,visual,shake)",
+  "divider()",
+  "header(Debug)",
   "toggle(Show Hitboxes,visual,hitboxes)",
 ]
 let gotToggles=false
+let gotSliders=false
+let optionsMove=0
 function drawOptions(){
+    optionsMove++
     ctx.clearRect(0,0,c.width,c.height)
-    const cx = c.width / 2
-    const cy = c.height / 2
-    const r = Math.max(c.width, c.height) / 1.2
-
-    const g = ctx.createRadialGradient(
-      cx, cy, r * 0.1,
-      cx, cy, r
-    )
-
-    g.addColorStop(0, "rgb(58, 21, 110)")
-    g.addColorStop(0.6, "rgb(24, 12, 69)")
-    g.addColorStop(1, "rgb(7, 5, 33)")
-
-    ctx.fillStyle = g
-    ctx.fillRect(0, 0, c.width, c.height)
     
-    const boxGra = ctx.createLinearGradient(25, 0, c.width-50, optionsBoxSize)
-     boxGra.addColorStop(0, "#e0b280")
-     boxGra.addColorStop(0.15, "#bd8d5c")
-     boxGra.addColorStop(0.5, "#a1663f")
-     boxGra.addColorStop(1, "#784528")
-     ctx.fillStyle = boxGra
+    const sky=new Image()
+    const bg=new Image()
+    sky.src="https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/skyDusk.png"
+    bg.src="https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgDusk.png"
+    ctx.drawImage(sky,0,0,128*scale,512*scale)
+    
+    const cameraX=optionsMove-c.width/2
+    const bgOffsetX = Math.floor(-optionsMove%(128*scale))
+    for(let x=bgOffsetX;x<c.width;x+=128*scale)ctx.drawImage(bg,x,256,128*scale,512*scale)
+    
+     ctx.fillStyle = "rgba(39,39,48,0.7)"
      ctx.fillRect(25, scrollY, c.width-50, optionsBoxSize)
-     
-     const boxBorderGra = ctx.createLinearGradient(25, 0, c.width-50, optionsBoxSize)
-     boxBorderGra.addColorStop(0, "#bd8d5c")
-     boxBorderGra.addColorStop(0.15, "#a1663f")
-     boxBorderGra.addColorStop(0.5, "#784528")
-     boxBorderGra.addColorStop(1, "#4d2714")
-    ctx.strokeStyle = boxBorderGra
-    ctx.lineWidth = 8
-    ctx.strokeRect(25, scrollY, c.width-50, optionsBoxSize)
     
     const dx=45
     const maxX=c.width-90
@@ -4304,6 +4629,7 @@ function drawOptions(){
       index++
       const params=parseUiPiece(txt)
       switch(params[0]){
+        case "space":dy+=Number(params[1])||0;break;
         case "divider":{
           const txtGra=ctx.createLinearGradient(0, dy+scrollY, 0, dy+scrollY+20)
           txtGra.addColorStop(0, "#ffffff")
@@ -4315,7 +4641,7 @@ function drawOptions(){
           ctx.strokeRect(dx+10,dy+scrollY,maxX-10,20)
           ctx.fillRect(dx+10,dy+scrollY,maxX-10,20)
           ctx.fillStyle = "#fff"
-          ctx.lineWidth = 1
+          ctx.lineWidth = 4
           dy+=80
         }
         break
@@ -4343,6 +4669,25 @@ function drawOptions(){
         }
         break
         
+        case "text":{
+          const lines=wrapText(params[1],maxX,true)
+          lines.forEach(line=>{
+            const txtGra=ctx.createLinearGradient(0, dy+scrollY, 0, dy+scrollY+16)
+            txtGra.addColorStop(0, "#c3c8db")
+            txtGra.addColorStop(0.15, "#898fab")
+            txtGra.addColorStop(0.5, "#5d6380")
+            txtGra.addColorStop(1, "#3e445e")
+            ctx.fillStyle = txtGra
+            
+            ctx.strokeText(line, dx+10, dy+scrollY)
+            ctx.fillText(line, dx+10, dy+scrollY)
+            dy+=20
+          })
+          ctx.fillStyle = "#fff"
+          ctx.shadowBlur = 0
+        }
+        break
+        
         case "toggle":{
           const basey=dy
           const lines=wrapText(params[1],200,true)
@@ -4365,14 +4710,23 @@ function drawOptions(){
           if(!gotToggles)toggles.push({x:toggleX,y:toggleY,cat:params[2],field:params[3]})
           
           const toggleGra=ctx.createLinearGradient(0, toggleY+scrollY, 0, toggleY+scrollY+16)
-          toggleGra.addColorStop(0, "#c3c8db")
-          toggleGra.addColorStop(0.15, "#898fab")
-          toggleGra.addColorStop(0.5, "#5d6380")
-          toggleGra.addColorStop(1, "#3e445e")
+          toggleGra.addColorStop(0, activated?"#255925":"#571e1e")
+          toggleGra.addColorStop(0.15, activated?"#184218":"#401515")
+          toggleGra.addColorStop(0.5, activated?"#0f300f":"#300e0e")
+          toggleGra.addColorStop(1, activated?"#092409":"#1c0707")
           ctx.fillStyle = toggleGra
+          ctx.strokeStyle = activated?"#041704":"#030000"
           
           ctx.strokeRect(toggleX, toggleY+scrollY+3,50,10)
           ctx.fillRect(toggleX, toggleY+scrollY+3,50,10)
+          
+          const pinGra=ctx.createLinearGradient(0, toggleY+scrollY, 0, toggleY+scrollY+16)
+          pinGra.addColorStop(0, "#c3c8db")
+          pinGra.addColorStop(0.15, "#898fab")
+          pinGra.addColorStop(0.5, "#5d6380")
+          pinGra.addColorStop(1, "#3e445e")
+          ctx.fillStyle = pinGra
+          ctx.strokeStyle = "#303447"
           
           ctx.strokeRect(toggleX+(activated?0:34), toggleY+scrollY,16,16)
           ctx.fillRect(toggleX+(activated?0:34), toggleY+scrollY,16,16)
@@ -4382,8 +4736,61 @@ function drawOptions(){
           dy+=20
         }
         break
+        
+        case "slider":{
+          ctx.textAlign = "center"
+          
+          const txtGra=ctx.createLinearGradient(0, dy+scrollY, 0, dy+scrollY+16)
+          txtGra.addColorStop(0, "#c3c8db")
+          txtGra.addColorStop(0.15, "#898fab")
+          txtGra.addColorStop(0.5, "#5d6380")
+          txtGra.addColorStop(1, "#3e445e")
+          ctx.fillStyle = txtGra
+          
+          ctx.strokeText(params[1], dx+maxX/2, dy+scrollY)
+          ctx.fillText(params[1], dx+maxX/2, dy+scrollY)
+          dy+=30
+          
+          const sliderGra=ctx.createLinearGradient(0, dy+scrollY, 0, dy+scrollY+25)
+          sliderGra.addColorStop(0, "#c3c8db")
+          sliderGra.addColorStop(0.15, "#898fab")
+          sliderGra.addColorStop(0.5, "#5d6380")
+          sliderGra.addColorStop(1, "#3e445e")
+          ctx.fillStyle =sliderGra
+          
+          ctx.strokeRect(dx+20,dy+scrollY+10,maxX-20,5)
+          ctx.fillRect(dx+20,dy+scrollY+10,maxX-20,5)
+         
+          
+          const sliderValue=gameOptions[params[2]]?.[params[3]]
+         
+          const pinX=((maxX-35)*sliderValue)+dx+20
+          ctx.strokeRect(pinX,dy+scrollY,15,25)
+          ctx.fillRect(pinX,dy+scrollY,15,25)
+          if(! gotSliders)sliders.push({x:dx+20,w:maxX-20,y:dy,h:25,cat:params[2],field:params[3]})
+          
+          dy+=39
+          ctx.lineWidth = 4
+          const displayGra=ctx.createLinearGradient(0, dy+scrollY, 0, dy+scrollY+16)
+          displayGra.addColorStop(0, "#c3c8db")
+          displayGra.addColorStop(0.15, "#898fab")
+          displayGra.addColorStop(0.5, "#5d6380")
+          displayGra.addColorStop(1, "#3e445e")
+          ctx.fillStyle = displayGra
+          
+          const sliderLabel=sliderValue.toFixed(2)
+          ctx.strokeText(sliderLabel, dx+20+maxX/2-10, dy+scrollY)
+          ctx.fillText(sliderLabel, dx+20+maxX/2-10, dy+scrollY)
+          dy+=20
+          
+          ctx.fillStyle = "#fff"
+          ctx.shadowBlur = 0
+          ctx.textAlign = "left"
+        }
+        break
       }
     }
+    gotSliders=true
     gotToggles=true
 }
     
@@ -4420,7 +4827,7 @@ drawPlatform(p)
 })
 
 props.forEach(p=>{
-  if (!p.onTopPlatform || p.front) return
+  if (!p.onTopPlatform || p.front || !gameOptions.visual.props) return
   const tileW = 64 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
   const tileH = 128 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
 
@@ -4452,15 +4859,22 @@ if(!isOnScreen(p,100)) return
 drawPlatform(p)
 })
 
-if (player.onTopPlatform&&!player.onStackablePlatform) drawPlayer(player)
+ctx.strokeStyle = "red"
+if (player.onTopPlatform&&!player.onStackablePlatform){
+    drawPlayer(player)
+    if(gameOptions.visual.hitboxes)ctx.strokeRect(player.x-cameraX,player.y-cameraY,player.w,player.h)
+}
 
+ctx.strokeStyle = "blue"
 topPlatforms.forEach(p => {
 if(!p.alwaysLoad&&!isOnScreen(p,100)) return
 drawPlatformBottom(p)
+
+if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,c.height)
 })
 
 props.forEach(p=>{
-  if (p.onTopPlatform || p.front) return
+  if (p.onTopPlatform || p.front || !gameOptions.visual.props) return
   const tileW = 64 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
   const tileH = 128 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
 
@@ -4488,6 +4902,7 @@ props.forEach(p=>{
 
 drawStartExit()
 
+ctx.strokeStyle = "green"
 powerups.forEach(p => {
     ctx.drawImage(
             powerupsImages[p.type],
@@ -4497,6 +4912,7 @@ powerups.forEach(p => {
             (16 * objScale),
             (16 * objScale)
         )
+        if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,p.h)
 })
 
 pasteis.forEach(p => {
@@ -4508,6 +4924,7 @@ pasteis.forEach(p => {
             (16 * objScale),
             (16 * objScale)
         )
+        if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,p.h)
 })
 
 if(!tomatoes[level]){
@@ -4519,35 +4936,79 @@ if(!tomatoes[level]){
        (16 * objScale),
        (16 * objScale),
     )
+    if(gameOptions.visual.hitboxes)ctx.strokeRect(tomato.x-cameraX,tomato.y-cameraY,tomato.w,tomato.h)
 }
+
+ctx.strokeStyle = "red"
+ctx.lineWidth = 4
 
 enemiesPexeira.forEach(enemy => {
   if (enemy.state === "dead" || !isOnScreen(enemy, 50)) return
   drawEnemy(enemy)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 
 enemiesTongoloide.forEach(enemy => {
   if (enemy.state === "dead" || !isOnScreen(enemy, 50)) return
   drawEnemy(enemy)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 
 enemiesFeixe.forEach(enemy => {
   if (enemy.state === "dead" || !isOnScreen(enemy, 50)) return
   drawEnemy(enemy)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 
 enemiesRosal.forEach(enemy => {
   if (enemy.state === "dead" || !isOnScreen(enemy, 50)) return
   drawEnemy(enemy)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 
 enemiesMamute.forEach(enemy => {
   if (!isOnScreen(enemy, 50)) return
   drawEnemy(enemy,{center:false,offsetX:-6,deadFix:false})
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 
-if (!player.onTopPlatform||player.onStackablePlatform) drawPlayer(player)
+if (!player.onTopPlatform||player.onStackablePlatform){
+    drawPlayer(player)
+    if(gameOptions.visual.hitboxes)ctx.strokeRect(player.x-cameraX,player.y-cameraY,player.w,player.h)
+}
 
+if(boss){
+  switch(boss.id){
+    case 1:{
+      const size=64
+      const animY=boss.state==="shoot"?64:boss.state==="protect"?128:boss.state==="dead"?192:0
+      
+      const frames=4
+      const frame=Math.floor(boss.frame||0)%frames
+      
+      const drawSize=Math.floor(size*eneScale*1.5)
+      const drawX=Math.floor(boss.x-cameraX)
+      const drawY=Math.floor(boss.y-cameraY-11*eneScale*1.5)
+      
+      ctx.drawImage(
+        enemyImgs.kingPastelo,
+        frame*size,
+        animY,
+        size,
+        size,
+        drawX,
+        drawY,
+        drawSize,
+        drawSize
+      )
+      boss.frame+=0.15
+      if(gameOptions.visual.hitboxes)ctx.strokeRect(boss.x-cameraX,boss.y-cameraY,boss.w,boss.h)
+    }
+    break
+  }
+}
+
+ctx.strokeStyle = "green"
 items.forEach(item => {
     const img = itemsImgs[item.type]??itemsImgs.pastel
     ctx.drawImage(
@@ -4558,38 +5019,62 @@ items.forEach(item => {
             (16 * objScale),
             (16 * objScale)
         )
+        if(gameOptions.visual.hitboxes)ctx.strokeRect(item.x-cameraX,item.y-cameraY,item.w,item.h)
 })
 
+ctx.strokeStyle = "red"
 bullets.forEach(b=>{
   if(!isOnScreen(b,20)) return
   const drawX=b.x-cameraX
   const drawY=b.y-cameraY-1
-  const size=16
+  const size=b.skin==="oil"?24:16
   ctx.save()
+  const img=b.skin==="oil"?enemyImgs.bulletOil:enemyImgs.bullet
   if(b.vx>0){
     ctx.translate(drawX+size,drawY)
     ctx.scale(-1, 1)
-    ctx.drawImage(enemyImgs.bullet, 0, 0, 16, 16,0, 0, size, size)
-  } else ctx.drawImage(enemyImgs.bullet, 0, 0, 16, 16,drawX, drawY, size, size)
+    ctx.drawImage(img, 0, 0, 16, 16,0, 0, size, size)
+  } else ctx.drawImage(img, 0, 0, 16, 16,drawX, drawY, size, size)
   ctx.restore()
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(b.x-cameraX,b.y-cameraY,b.w,b.h)
 })
 
+puddles.forEach(p=>{
+  if(!isOnScreen(p,50))return
+  
+  let img=enemyImgs.puddle
+  if(p.type==="oil")img=enemyImgs.oilPuddle
+  
+  let frame=Math.floor((1-p.time/p.baseTime)*4)
+  frame=clamp(0,3,frame)
+  
+ const drawX=p.x+p.w/2-32-cameraX
+ const drawY=p.y+p.h-32-cameraY
+ 
+ ctx.drawImage(img, 0, frame*16, 32, 16,drawX, drawY, 64, 32)
+ if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,p.h)
+})
+
+ctx.strokeStyle = "blue"
 houses.forEach(h=>{
    drawHouses(h)
+   //if(gameOptions.visual.hitboxes)ctx.strokeRect(h.x+4-cameraX,h.y+4-cameraY,item.w-8,item.h-8)
 })
 
 platforms.forEach(p=>{
   if(!p.alwaysLoad&&!isOnScreen(p,100)) return
   drawPlatformBottom(p)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,c.height)
 })
 
 walkways.forEach(p=>{
   if(!p.alwaysLoad&&!isOnScreen(p,100)) return
   drawWalkwayBottom(p)
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(p.x-cameraX,p.y-cameraY,p.w,p.h)
 })
 
+ctx.strokeStyle = "yellow"
 if(isOnScreen(checkpoint,200) && checkpointImg.complete) {
-
   const checkpointTileW = 64 * checkpointScale
   const checkpointTileH = 64 * checkpointScale
 
@@ -4597,10 +5082,11 @@ if(isOnScreen(checkpoint,200) && checkpointImg.complete) {
     const checkpointDrawY = ((checkpoint.y + checkpoint.h)  - checkpointTileH - cameraY) | 0
 
      ctx.drawImage(checkpointImg, 0, 0, 64, 64, checkpointDrawX, checkpointDrawY, checkpointTileW, checkpointTileH)
+     if(gameOptions.visual.hitboxes)ctx.strokeRect(checkpoint.x-cameraX, checkpoint.y-cameraY, checkpoint.w, checkpoint.h)
 }
 
 props.forEach(p=>{
-  if (!p.front) return
+  if (!p.front || !gameOptions.visual.props) return
   const tileW = 64 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
   const tileH = 128 * (p.small ? propScale/2 : p.big ? propScale*2 : propScale)
 
@@ -4626,6 +5112,7 @@ props.forEach(p=>{
 
 })
 
+ctx.strokeStyle = "red"
 enemiesSnerm.forEach(enemy => {
   if (enemy.state === "dead" || !isOnScreen(enemy, 50)) return
   const s=Math.sin(gameTime*enemy.vy/10)
@@ -4633,6 +5120,7 @@ enemiesSnerm.forEach(enemy => {
   const flipY=offsetY<enemy.lastOffsetY?-1:1
   enemy.lastOffsetY=offsetY
   drawEnemy(enemy,{flipY})
+  if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
 })
 gymSnerm.forEach((enemy,i) => {
   if(enemy.lightTime){
@@ -4644,22 +5132,27 @@ gymSnerm.forEach((enemy,i) => {
      lightGra.addColorStop(1, "rgba(158,42,33,1)")
      ctx.fillStyle=lightGra
      ctx.fillRect(enemy.lightX-cameraX, enemy.lightY-size-cameraY, enemy.lightW, size)
-  }else drawEnemy(enemy)
+  }else{
+    drawEnemy(enemy)
+    if(gameOptions.visual.hitboxes)ctx.strokeRect(enemy.x-cameraX,enemy.y-cameraY,enemy.w,enemy.h)
+  }
 })
 
 if(levelData?.water?.y){
 	let waterY=(levelData.water.y-cameraY+4)||0
-	let t=performance.now()*0.003
-	ctx.filter="blur(1px)"
-	for(let y=waterY;y<c.height;y+=8){
-		let offset=Math.sin(y*0.08+t)*3
-		ctx.drawImage(
-			c,
-			0,y,
-			c.width,8,
-			offset,y,
-			c.width,8
-		)
+	if(gameOptions.visual.water){
+          let t=performance.now()*0.003
+          ctx.filter="blur(1px)"
+          for(let y=waterY;y<c.height;y+=8){
+            let offset=Math.sin(y*0.08+t)*3
+            ctx.drawImage(
+              c,
+              0,y,
+              c.width,8,
+              offset,y,
+              c.width,8
+            )
+          }
 	}
 	
 	const waterX = (Math.floor(player.x/(16*objScale))*16-((gameTime*16*levelData.water.flow/45)%16))*objScale-500*objScale
@@ -4692,8 +5185,8 @@ enemiesRosal.forEach(enemy => {
   drawEnemy(enemy)
 })
 
-const lvlClim=levelData?.climate
-  if(lvlClim){
+  const lvlClim=levelData?.climate
+  if(lvlClim&&gameOptions.visual.particles){
     if(climate.length<lvlClim.count)for(let i=climate.length; i<lvlClim.count; i++){
       const obj={x:lvlClim.baseX??sort(0,390), y:lvlClim.baseY??sort(0,670), vari:sort(1,lvlClim.vari??1)}
       obj.vx=Array.isArray(lvlClim.vx)?sort(lvlClim.vx[0],lvlClim.vx[1]):lvlClim.vx
@@ -4718,10 +5211,11 @@ const lvlClim=levelData?.climate
             64,
             64
         )
-    }
+     }
   }
 
 particles.forEach(p=>{
+  if(!gameOptions.visual.particles)return
   drawParticle(p)
 })
 
@@ -4732,7 +5226,7 @@ particles.forEach(p=>{
   ctx.textBaseline = "bottom"
   
  const levelFilter = levelData.filter
-  if (levelFilter) {
+  if (levelFilter&&gameOptions.visual.lights) {
      ctx.save()
      ctx.globalCompositeOperation="multiply"
      ctx.fillStyle = `rgba(${levelFilter.r}, ${levelFilter.g}, ${levelFilter.b}, ${levelFilter.a})`
@@ -4741,6 +5235,7 @@ particles.forEach(p=>{
   }
 
   lights.forEach(l => {
+      if(!gameOptions.visual.lights)return
       const grandient = ctx.createRadialGradient(
          l.x-cameraX,l.y-cameraY,0,
          l.x-cameraX,l.y-cameraY,l.radius,
@@ -4755,10 +5250,6 @@ particles.forEach(p=>{
        ctx.arc(l.x-cameraX,l.y-cameraY,l.radius,0,Math.PI * 2)
        ctx.fill()
   })
-  
- 
-
- 
   
   drawUi()
   
