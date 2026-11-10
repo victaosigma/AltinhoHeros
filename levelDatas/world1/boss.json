@@ -1,0 +1,99 @@
+{
+  "music": "boss_bugga",
+  "bgSrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/favela/bgDusk.png",
+  "skySrc": "https://raw.githubusercontent.com/victaosigma/AltinhoHeros/refs/heads/main/assets/images/backgrounds/suburb/skyDusk.png",
+  "filter": {
+    "r": 210,
+    "g": 156,
+    "b": 230,
+    "a": 0.6
+  },
+  "lockX": 390,
+  "lockY": 670,
+  "player": {
+    "x": 345,
+    "y": 560
+  },
+  "startPlat": {
+    "x": 9000,
+    "y": 442
+  },
+  "exitPlat": {
+    "x": 9000,
+    "y": 462
+  },
+  "checkpoint": {
+    "x": 9000,
+    "y": 422
+  },
+  "tomato": {
+    "x": 9000,
+    "y": 232
+  },
+  "platforms": [
+    {
+      "x": -100,
+      "y": 670,
+      "w": 600,
+      "type": "stone1"
+    }
+  ],
+  "props": [
+    {
+      "x": -20,
+      "y": 600,
+      "type": "favelaHouse1",
+      "big": true
+    },
+    {
+      "x": 50,
+      "y": 600,
+      "type": "favelaHouse3",
+      "big": true
+    },
+    {
+      "x": 365,
+      "y": 600,
+      "type": "pole1"
+    },
+    {
+      "x": 18,
+      "y": 600,
+      "type": "bench1"
+    },
+    {
+      "x": 170,
+      "y": 650,
+      "type": "sergWall",
+      "big": true
+    },
+    {
+      "x": 150,
+      "y": 600,
+      "type": "fridge"
+    },
+    {
+      "x": 275,
+      "y": 575,
+      "type": "deepFryer"
+    },
+    {
+      "x": 230,
+      "y": 600,
+      "type": "sergFear",
+      "gif": true
+    },
+    {
+      "x": 170,
+      "y": 650,
+      "type": "sergTruck",
+      "big": true
+    },
+    {
+      "x": 215,
+      "y": 577,
+      "type": "condiments"
+    }
+  ],
+  "boss": 1
+}
